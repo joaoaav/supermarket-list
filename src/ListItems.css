@@ -1,0 +1,28 @@
+.icon {
+  padding-left: 10px;
+}
+
+.green {
+  color: green;
+}
+
+.red {
+  color: red;
+}
+
+.hidden-icon {
+  display: none;
+}
+
+.left {
+  clear: left;
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+.add-item {
+  padding-top: 15px;
+}
