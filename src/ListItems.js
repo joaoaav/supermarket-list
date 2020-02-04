@@ -21,8 +21,17 @@ class ListItems extends Component {
 
   addNewItem = function(itemName) {
     let newList = this.state.list;
+    let index = 1;
+    if (newList.length > 0) {
+      index =
+        newList.reduce(
+          (max, p) => (p.key > max ? p.key : max),
+          newList[0].key
+        ) + 1;
+    }
+
     newList.push({
-      key: newList.length + 1,
+      key: index,
       name: itemName,
       checked: false
     });
@@ -33,7 +42,7 @@ class ListItems extends Component {
 
   checkItem = function(key) {
     let newList = this.state.list;
-    let objIndex = newList.findIndex(obj => obj.key == key);
+    let objIndex = newList.findIndex(obj => obj.key === key);
     newList[objIndex].checked = !newList[objIndex].checked;
     this.setState({ list: newList });
   };
