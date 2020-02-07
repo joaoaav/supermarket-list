@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { ReactSortable } from "react-sortablejs";
 import { FaCheckCircle, FaPlus, FaTrash } from "react-icons/fa";
 import "./ListItems.css";
+import firebase from "@firebase/app";
 
 class ListItems extends Component {
   constructor(props) {
@@ -13,6 +14,10 @@ class ListItems extends Component {
     };
 
     this.updateInput = this.updateInput.bind(this);
+  }
+
+  componentDidMount() {
+    this.setState({ list: this.props.items });
   }
 
   updateInput(event) {
@@ -30,11 +35,21 @@ class ListItems extends Component {
         ) + 1;
     }
 
-    newList.push({
+    var newItem = {
       key: index,
       name: itemName,
-      checked: false
-    });
+      checked: false,
+      order: index
+    };
+
+    firebase
+      .firestore()
+      .collection("supermarket-list")
+      .doc("supermarket-list" + index)
+      .set(newItem)
+      .then();
+
+    newList.push(newItem);
     this.setState({ list: newList });
     localStorage.setItem("list", JSON.stringify(newList));
     this.setState({ newItem: "" });
@@ -52,7 +67,36 @@ class ListItems extends Component {
     var filteredList = list.filter(function(e) {
       return e.key !== key;
     });
+
+    firebase
+      .firestore()
+      .collection("supermarket-list")
+      .doc("supermarket-list" + key)
+      .delete()
+      .then();
+
     this.setState({ list: filteredList });
+  };
+
+  removeAllItems = function() {
+    const collection = firebase
+      .firestore()
+      .collection("supermarket-list")
+      .get();
+
+    collection.then(doc => {
+      doc.docs.map(doc => {
+        var item = doc.data();
+        firebase
+          .firestore()
+          .collection("supermarket-list")
+          .doc("supermarket-list" + item.key)
+          .delete()
+          .then();
+      });
+    });
+
+    this.setState({ list: [] });
   };
 
   render() {
@@ -91,6 +135,14 @@ class ListItems extends Component {
               this.addNewItem(this.state.newItem);
             }}
           ></FaPlus>
+        </div>
+        <div
+          onClick={() => {
+            this.removeAllItems();
+          }}
+        >
+          <label>Remove All</label>
+          <FaTrash className={"icon"}></FaTrash>
         </div>
       </div>
     );
