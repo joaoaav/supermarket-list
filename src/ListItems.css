@@ -1,5 +1,6 @@
 .icon {
   padding-left: 10px;
+  padding-top: 5px;
 }
 
 .green {
@@ -25,4 +26,12 @@
 
 .add-item {
   padding-top: 15px;
+}
+
+.item-checked {
+  background-color: #40464a;
+}
+
+.clear-items {
+  margin-top: 30px;
 }

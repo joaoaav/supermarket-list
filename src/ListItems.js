@@ -10,7 +10,9 @@ class ListItems extends Component {
 
     this.state = {
       list: [],
-      newItem: ""
+      newItem: "",
+      docPrefixName: props.docPrefixName,
+      collection: firebase.firestore().collection(props.collectionName)
     };
 
     this.updateInput = this.updateInput.bind(this);
@@ -38,35 +40,35 @@ class ListItems extends Component {
     this.setState({ newItem: event.target.value });
   }
 
-  addNewItem = function(itemName) {
-    let newList = this.state.list;
-    let index = 1;
-    if (newList.length > 0) {
-      index =
-        newList.reduce(
-          (max, p) => (p.key > max ? p.key : max),
-          newList[0].key
-        ) + 1;
+  addItem = function(itemName) {
+    if (itemName.trim() !== "") {
+      let newList = this.state.list;
+      let index = 1;
+      if (newList.length > 0) {
+        index =
+          newList.reduce(
+            (max, p) => (p.key > max ? p.key : max),
+            newList[0].key
+          ) + 1;
+      }
+
+      var newItem = {
+        key: index,
+        name: itemName,
+        checked: false,
+        order: index
+      };
+
+      this.state.collection
+        .doc(this.state.docPrefixName + index)
+        .set(newItem)
+        .then();
+
+      newList.push(newItem);
+      this.setState({ list: newList });
+      localStorage.setItem("list", JSON.stringify(newList));
+      this.setState({ newItem: "" });
     }
-
-    var newItem = {
-      key: index,
-      name: itemName,
-      checked: false,
-      order: index
-    };
-
-    firebase
-      .firestore()
-      .collection("supermarket-list")
-      .doc("supermarket-list" + index)
-      .set(newItem)
-      .then();
-
-    newList.push(newItem);
-    this.setState({ list: newList });
-    localStorage.setItem("list", JSON.stringify(newList));
-    this.setState({ newItem: "" });
   };
 
   checkItem = function(key) {
@@ -82,10 +84,8 @@ class ListItems extends Component {
       return e.key !== key;
     });
 
-    firebase
-      .firestore()
-      .collection("supermarket-list")
-      .doc("supermarket-list" + key)
+    this.state.collection
+      .doc(this.state.docPrefixName + key)
       .delete()
       .then();
 
@@ -93,18 +93,13 @@ class ListItems extends Component {
   };
 
   removeAllItems = function() {
-    const collection = firebase
-      .firestore()
-      .collection("supermarket-list")
-      .get();
+    const collection = this.state.collection.get();
 
     collection.then(doc => {
       doc.docs.map(doc => {
         var item = doc.data();
-        firebase
-          .firestore()
-          .collection("supermarket-list")
-          .doc("supermarket-list" + item.key)
+        this.state.collection
+          .doc(this.state.docPrefixName + item.key)
           .delete()
           .then();
       });
@@ -114,52 +109,50 @@ class ListItems extends Component {
   };
 
   onSortEnd = ({ oldIndex, newIndex }) => {
-    firebase
-      .firestore()
-      .collection("supermarket-list")
-      .where("order", "==", oldIndex + 1)
-      .get()
-      .then(function(querySnapshot) {
-        querySnapshot.forEach(function(doc) {
-          firebase
-            .firestore()
-            .collection("supermarket-list")
-            .doc(doc.id)
-            .update({
-              order: newIndex + 1
-            });
+    if (oldIndex !== newIndex) {
+      this.state.collection
+        .where("order", "==", oldIndex + 1)
+        .get()
+        .then(function(querySnapshot) {
+          querySnapshot.forEach(function(doc) {
+            firebase
+              .firestore()
+              .collection("supermarket-list")
+              .doc(doc.id)
+              .update({
+                order: newIndex + 1
+              });
+          });
         });
-      });
 
-    firebase
-      .firestore()
-      .collection("supermarket-list")
-      .where("order", "==", newIndex + 1)
-      .get()
-      .then(function(querySnapshot) {
-        querySnapshot.forEach(function(doc) {
-          firebase
-            .firestore()
-            .collection("supermarket-list")
-            .doc(doc.id)
-            .update({
-              order: oldIndex + 1
-            });
+      this.state.collection
+        .where("order", "==", newIndex + 1)
+        .get()
+        .then(function(querySnapshot) {
+          querySnapshot.forEach(function(doc) {
+            firebase
+              .firestore()
+              .collection("supermarket-list")
+              .doc(doc.id)
+              .update({
+                order: oldIndex + 1
+              });
+          });
         });
-      });
+    }
   };
 
   render() {
     return (
       <div>
         <ReactSortable
-          animation={500}
+          animation={200}
           onEnd={this.onSortEnd}
           list={this.state.list}
           setList={newState => this.setState({ list: newState })}
         >
           {this.state.list.map(item => (
-            <div key={item.key}>
+            <div key={item.key} className={item.checked ? "item-checked" : ""}>
               <span onDoubleClick={() => this.checkItem(item.key)}>
                 {item.name}
                 <FaCheckCircle
@@ -184,12 +177,13 @@ class ListItems extends Component {
           <FaPlus
             className={"icon"}
             onClick={() => {
-              this.addNewItem(this.state.newItem);
+              this.addItem(this.state.newItem);
             }}
           ></FaPlus>
         </div>
         <div
-          onClick={() => {
+          className="clear-items"
+          onDoubleClick={() => {
             this.removeAllItems();
           }}
         >

@@ -15,7 +15,11 @@ function App() {
             ) : (
               <div>
                 <h1>Items</h1>
-                <ListItems items={data} />
+                <ListItems
+                  items={data}
+                  collectionName="supermarket-list"
+                  docPrefixName="item"
+                />
               </div>
             );
           }}
