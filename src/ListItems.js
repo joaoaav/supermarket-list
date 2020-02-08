@@ -95,9 +95,9 @@ class ListItems extends Component {
   removeAllItems = function() {
     const collection = this.state.collection.get();
 
-    collection.then(doc => {
-      doc.docs.map(doc => {
-        var item = doc.data();
+    collection.then(documents => {
+      documents.docs.map(document => {
+        var item = document.data();
         this.state.collection
           .doc(this.state.docPrefixName + item.key)
           .delete()
