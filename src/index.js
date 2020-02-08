@@ -10,8 +10,8 @@ import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 
 const config = {
-  apiKey: "<API KEY>",
-  projectId: "<Project ID>"
+  apiKey: process.env.REACT_APP_FIRESTORE_APIKEY,
+  projectId: process.env.REACT_APP_FIRESTORE_PROJECTID
 };
 firebase.initializeApp(config);
 
