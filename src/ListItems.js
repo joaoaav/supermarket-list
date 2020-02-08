@@ -17,8 +17,22 @@ class ListItems extends Component {
   }
 
   componentDidMount() {
-    this.setState({ list: this.props.items });
+    this.setState({ list: this.props.items.sort(this.compare) });
   }
+
+  compare = function(a, b) {
+    // Use toUpperCase() to ignore character casing
+    const orderA = a.order;
+    const orderB = b.order;
+
+    let comparison = 0;
+    if (orderA > orderB) {
+      comparison = 1;
+    } else if (orderA < orderB) {
+      comparison = -1;
+    }
+    return comparison;
+  };
 
   updateInput(event) {
     this.setState({ newItem: event.target.value });
@@ -99,10 +113,48 @@ class ListItems extends Component {
     this.setState({ list: [] });
   };
 
+  onSortEnd = ({ oldIndex, newIndex }) => {
+    firebase
+      .firestore()
+      .collection("supermarket-list")
+      .where("order", "==", oldIndex + 1)
+      .get()
+      .then(function(querySnapshot) {
+        querySnapshot.forEach(function(doc) {
+          firebase
+            .firestore()
+            .collection("supermarket-list")
+            .doc(doc.id)
+            .update({
+              order: newIndex + 1
+            });
+        });
+      });
+
+    firebase
+      .firestore()
+      .collection("supermarket-list")
+      .where("order", "==", newIndex + 1)
+      .get()
+      .then(function(querySnapshot) {
+        querySnapshot.forEach(function(doc) {
+          firebase
+            .firestore()
+            .collection("supermarket-list")
+            .doc(doc.id)
+            .update({
+              order: oldIndex + 1
+            });
+        });
+      });
+  };
+
   render() {
     return (
       <div>
         <ReactSortable
+          animation={500}
+          onEnd={this.onSortEnd}
           list={this.state.list}
           setList={newState => this.setState({ list: newState })}
         >
