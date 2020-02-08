@@ -66,3 +66,23 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 ### `yarn build` fails to minify
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+
+### Deploying
+
+Reference: https://medium.com/@impaachu/host-a-react-based-website-free-of-cost-with-firebase-hosting-and-connect-with-your-own-domain-53146731807f
+
+#### Configure deployment with Firebase Hosting
+
+1. `npm install -g firebase-tools`
+1. `firebase login`
+1. `firebase init`
+1. ? Are you ready to proceed? `Yes`
+1. ? Which Firebase CLI features do you want to setup for this folder? Press Space to select features, then Enter to confirm your choices. `Hosting: Configure and deploy Firebase Hosting sites`
+1. Select the desired firebase project
+1. Folder `build`
+1. ? Configure a single-page app `Yes`
+
+#### Releasing
+
+1. `yarn build`
+1. `firebase deploy`
