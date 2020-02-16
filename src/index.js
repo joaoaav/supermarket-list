@@ -1,26 +1,24 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { Provider } from "react-redux";
 import "./index.css";
+
+import firebase from "@firebase/app";
+import "@firebase/firestore";
+import { FirestoreProvider } from "react-firestore";
+
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
-import rootReducer from "./reducers";
-import { createStore, applyMiddleware } from "redux";
-import {
-  createStateSyncMiddleware,
-  initStateWithPrevTab
-} from "redux-state-sync";
 
-const config = {};
-const middlewares = [createStateSyncMiddleware(config)];
-
-const store = createStore(rootReducer, {}, applyMiddleware(...middlewares));
-initStateWithPrevTab(store);
+const config = {
+  apiKey: process.env.REACT_APP_FIRESTORE_APIKEY,
+  projectId: process.env.REACT_APP_FIRESTORE_PROJECTID
+};
+firebase.initializeApp(config);
 
 ReactDOM.render(
-  <Provider store={store}>
+  <FirestoreProvider firebase={firebase}>
     <App />
-  </Provider>,
+  </FirestoreProvider>,
   document.getElementById("root")
 );
 
