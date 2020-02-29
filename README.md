@@ -1,10 +1,31 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+## Database Configuration
 
-In the project directory, you can run:
+We are using a simple Database on Firebase. Head towards https://console.firebase.google.com/u/0/ and
+enter a name for your project. Turn off the option "Enable Google Analytics for this project" and click on
+'Create Project'
 
-### `yarn start`
+Once project is created, select 'Database' in the left menu and then 'Create Database'.
+Click 'Start in test mode'. Select the relevant location for your project
+
+Click '+Start collection' and name it 'supermarket-list'
+Enter any document name to it and click Save
+
+## Configure environment file
+
+In the project folder create a file .env with the following:
+
+REACT_APP_FIRESTORE_APIKEY=<your_firestore_project_apikey>
+REACT_APP_FIRESTORE_PROJECTID=<your_firestore_project_projectid>
+
+You can get get these values under Project Settings -> Firebase SDK snippet on your Firebase account
+
+## To start the App
+
+In the project directory run the command `yarn install`
+
+and then `yarn start`
 
 Runs the app in the development mode.<br />
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
