@@ -152,7 +152,10 @@ class ListItems extends Component {
           setList={newState => this.setState({ list: newState })}
         >
           {this.state.list.map(item => (
-            <div key={item.key} className={item.checked ? "item-checked" : ""}>
+            <div
+              key={item.key}
+              className={"item " + (item.checked ? "item-checked" : "")}
+            >
               <span onDoubleClick={() => this.checkItem(item.key)}>
                 {item.name}
                 <FaCheckCircle

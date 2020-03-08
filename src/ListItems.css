@@ -28,6 +28,10 @@
   padding-top: 15px;
 }
 
+.item {
+  cursor: pointer;
+}
+
 .item-checked {
   background-color: #40464a;
 }
