@@ -3,6 +3,7 @@ import { ReactSortable } from 'react-sortablejs';
 import { FaCheckCircle, FaPlus, FaTrash } from 'react-icons/fa';
 import './ListItems.css';
 import firebase from '@firebase/app';
+import Button from './components/CustomButtons/Button.js';
 
 class ListItems extends Component {
 	constructor(props) {
@@ -162,6 +163,24 @@ class ListItems extends Component {
 									}
 								/>
 							</span>
+							<Button type="button" color="primary">
+								Primary
+							</Button>
+							<Button type="button" color="info">
+								Info
+							</Button>
+							<Button type="button" color="success">
+								Success
+							</Button>
+							<Button type="button" color="danger">
+								Danger
+							</Button>
+							<Button type="button" color="warning">
+								Warning
+							</Button>
+							<Button type="button" color="rose">
+								Rose
+							</Button>
 							<FaTrash
 								className={'icon red right'}
 								onDoubleClick={() => this.removeItem(item.key)}
