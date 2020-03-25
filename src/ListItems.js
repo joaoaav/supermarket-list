@@ -9,6 +9,7 @@ class ListItems extends Component {
     super(props);
 
     this.state = {
+      data: {},
       list: [],
       newItem: "",
       docPrefixName: props.docPrefixName,
@@ -19,23 +20,29 @@ class ListItems extends Component {
   }
 
   componentDidMount() {
-    this.setState({ list: this.props.items.sort(this.compare) });
+    if (this.props.data[0].items.length > 0) {
+      this.setState({
+        list: this.props.data[0].items.sort(this.compare("order"))
+      });
+    }
+
+    this.setState({ data: this.props.data[0] });
   }
 
   compare = function(sortBy) {
     return function(a, b) {
-    // Use toUpperCase() to ignore character casing
+      // Use toUpperCase() to ignore character casing
       const orderA = a[sortBy];
       const orderB = b[sortBy];
 
-    let comparison = 0;
-    if (orderA > orderB) {
-      comparison = 1;
-    } else if (orderA < orderB) {
-      comparison = -1;
-    }
-    return comparison;
-  };
+      let comparison = 0;
+      if (orderA > orderB) {
+        comparison = 1;
+      } else if (orderA < orderB) {
+        comparison = -1;
+      }
+      return comparison;
+    };
   };
 
   updateInput(event) {
@@ -44,13 +51,13 @@ class ListItems extends Component {
 
   addItem = function(itemName) {
     if (itemName.trim() !== "") {
-      let newList = this.state.list;
+      let newData = this.state.data;
       let index = 1;
-      if (newList.length > 0) {
+      if (newData.items.length > 0) {
         index =
-          newList.reduce(
+          newData.items.reduce(
             (max, p) => (p.key > max ? p.key : max),
-            newList[0].key
+            newData.items[0].key
           ) + 1;
       }
 
@@ -61,14 +68,16 @@ class ListItems extends Component {
         order: index
       };
 
+      newData.items.push(newItem);
+
       this.state.collection
-        .doc(this.state.docPrefixName + index)
-        .set(newItem)
+        .doc(this.state.docPrefixName)
+        .set(newData)
         .then();
 
-      newList.push(newItem);
-      this.setState({ list: newList });
-      localStorage.setItem("list", JSON.stringify(newList));
+      this.setState({ list: newData.items });
+      this.setState({ data: newData });
+
       this.setState({ newItem: "" });
     }
   };
@@ -81,66 +90,52 @@ class ListItems extends Component {
   };
 
   removeItem = function(key) {
-    let list = this.state.list;
+    let newData = this.state.data;
+    let list = newData.items;
     var filteredList = list.filter(function(e) {
       return e.key !== key;
     });
 
+    newData.items = filteredList;
+
     this.state.collection
-      .doc(this.state.docPrefixName + key)
-      .delete()
+      .doc(this.state.docPrefixName)
+      .set(newData)
       .then();
 
-    this.setState({ list: filteredList });
+    this.setState({ list: newData.items });
   };
 
   removeAllItems = function() {
-    const collection = this.state.collection.get();
+    let newData = this.state.data;
 
-    collection.then(documents => {
-      documents.docs.map(document => {
-        var item = document.data();
-        this.state.collection
-          .doc(this.state.docPrefixName + item.key)
-          .delete()
-          .then();
-      });
-    });
+    newData.items = [];
 
-    this.setState({ list: [] });
+    this.state.collection
+      .doc(this.state.docPrefixName)
+      .set(newData)
+      .then();
+
+    this.setState({ list: newData.items });
   };
 
   onSortEnd = ({ oldIndex, newIndex }) => {
     if (oldIndex !== newIndex) {
-      this.state.collection
-        .where("order", "==", oldIndex + 1)
-        .get()
-        .then(function(querySnapshot) {
-          querySnapshot.forEach(function(doc) {
-            firebase
-              .firestore()
-              .collection("supermarket-list")
-              .doc(doc.id)
-              .update({
-                order: newIndex + 1
-              });
-          });
-        });
+      let newlist = this.state.list;
+
+      newlist.map((currElement, index) => {
+        currElement.order = index + 1;
+      });
+
+      let newData = this.state.data;
+      newData.items = newlist;
 
       this.state.collection
-        .where("order", "==", newIndex + 1)
-        .get()
-        .then(function(querySnapshot) {
-          querySnapshot.forEach(function(doc) {
-            firebase
-              .firestore()
-              .collection("supermarket-list")
-              .doc(doc.id)
-              .update({
-                order: oldIndex + 1
-              });
-          });
-        });
+        .doc(this.state.docPrefixName)
+        .set(newData)
+        .then();
+
+      this.setState({ list: newlist });
     }
   };
 

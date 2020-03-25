@@ -24,7 +24,7 @@ class App extends Component {
               <div>
                 <button onClick={signOut}>Sign out</button>
                 <FirestoreCollection
-                  path="supermarket-list"
+                  path="single-documents"
                   render={({ isLoading, data }) => {
                     return isLoading ? (
                       <div />
@@ -32,9 +32,9 @@ class App extends Component {
                       <div>
                         <h1>Items</h1>
                         <ListItems
-                          items={data}
-                          collectionName="supermarket-list"
-                          docPrefixName="item"
+                          data={data}
+                          collectionName="single-documents"
+                          docPrefixName="items"
                         />
                       </div>
                     );
