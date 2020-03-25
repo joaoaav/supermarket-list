@@ -22,10 +22,11 @@ class ListItems extends Component {
     this.setState({ list: this.props.items.sort(this.compare) });
   }
 
-  compare = function(a, b) {
+  compare = function(sortBy) {
+    return function(a, b) {
     // Use toUpperCase() to ignore character casing
-    const orderA = a.order;
-    const orderB = b.order;
+      const orderA = a[sortBy];
+      const orderB = b[sortBy];
 
     let comparison = 0;
     if (orderA > orderB) {
@@ -34,6 +35,7 @@ class ListItems extends Component {
       comparison = -1;
     }
     return comparison;
+  };
   };
 
   updateInput(event) {
