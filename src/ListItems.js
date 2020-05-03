@@ -1,9 +1,17 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment, View } from 'react';
 import { ReactSortable } from 'react-sortablejs';
 import { FaCheckCircle, FaPlus, FaTrash } from 'react-icons/fa';
 import './ListItems.css';
 import firebase from '@firebase/app';
 import Button from './components/CustomButtons/Button.js';
+import Primary from 'components/Typography/Primary.js';
+import Info from 'components/Typography/Info.js';
+import styles from 'assets/jss/material-dashboard-react/cardImagesStyles.js';
+
+// @material-ui/core components
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles(styles);
 
 class ListItems extends Component {
 	constructor(props) {
@@ -152,42 +160,27 @@ class ListItems extends Component {
 					onEnd={this.onSortEnd}
 					list={this.state.list}
 					setList={newState => this.setState({ list: newState })}
+					style={{ flexDirection: 'row', alignItems: 'center' }}
 				>
 					{this.state.list.map(item => (
 						<div key={item.key} className={item.checked ? 'item-checked' : ''}>
-							<span onDoubleClick={() => this.checkItem(item.key)}>
+							<Info onDoubleClick={() => this.checkItem(item.key)}>
 								{item.name}
 								<FaCheckCircle
 									className={
 										'icon green ' + (!item.checked ? 'hidden-icon' : '')
 									}
 								/>
-							</span>
-							<Button type="button" color="primary">
-								Primary
-							</Button>
-							<Button type="button" color="info">
-								Info
-							</Button>
-							<Button type="button" color="success">
-								Success
-							</Button>
-							<Button type="button" color="danger">
-								Danger
-							</Button>
-							<Button type="button" color="warning">
-								Warning
-							</Button>
-							<Button type="button" color="rose">
-								Rose
-							</Button>
-							<FaTrash
-								className={'icon red right'}
-								onDoubleClick={() => this.removeItem(item.key)}
-							></FaTrash>
+								<FaTrash
+									className={'icon red right'}
+									onDoubleClick={() => this.removeItem(item.key)}
+									style={{ alignItems: 'right' }}
+								></FaTrash>
+							</Info>
 						</div>
 					))}
 				</ReactSortable>
+
 				<div className="add-item">
 					<input
 						type="text"
@@ -207,7 +200,7 @@ class ListItems extends Component {
 						this.removeAllItems();
 					}}
 				>
-					<label>Remove All</label>
+					<Primary>Remove All</Primary>
 					<FaTrash className={'icon'}></FaTrash>
 				</div>
 			</div>
